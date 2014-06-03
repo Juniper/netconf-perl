@@ -1,0 +1,9 @@
+<configuration>
+  <system>
+	<services>
+	      <ftp/>
+	</services>
+  </system>
+</configuration>
+
+
