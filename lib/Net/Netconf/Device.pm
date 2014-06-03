@@ -292,11 +292,9 @@ my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     return unless ($xml);
 
     # Set the default values
-    $state_sent = Net::Netconf::Constants::NC_STATE_REQ_SENT 
-    unless ($state_sent);
-    $state_recv = Net::Netconf::Constants::NC_STATE_REQ_RECVD
-    unless ($state_recv);
-    $endtag = Net::Netconf::Constants::NC_REPLY_TAG unless ($endtag);
+    $state_sent = Net::Netconf::Constants::NC_STATE_REQ_SENT 	unless ($state_sent);
+    $state_recv = Net::Netconf::Constants::NC_STATE_REQ_RECVD   unless ($state_recv);
+    $endtag 	= Net::Netconf::Constants::NC_REPLY_TAG 		unless ($endtag);
 
     # Send the request to the Netconf server
     unless ($conn->send($xml)) {
@@ -305,25 +303,42 @@ my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     };
     
     $self->{'conn_state'} = $state_sent;
-    # Get a response from the Netconf server
-    while ($self->{'conn_state'} != $state_recv) 
+	
+    # Get a response from the Netconf server   
+    $in = $self->read_rpc( $endtag );
+	$self->parse_response( $in );
+}
+
+# Helper function to read RPC response until end tag
+sub read_rpc 
+{
+	my $self 	= shift;
+	my $endtag 	= shift;
+	
+	my $conn 	= $self->{'conn_obj'};
+	my $in 		= '';
+	
+	while ( $self->{'conn_state'} != Net::Netconf::Constants::NC_STATE_HELLO_RECVD ) 
 	{
-       if ($conn->eof) {
-           $self->report_error(1, 'connection to Netconf server lost');
-       }
+		if ($conn->eof) {
+			$self->report_error(1, 'connection to Netconf server lost');
+			return undef;
+		}
         
-       $in .= $conn->recv();
-       # Check to see if you received the end-tag
-       if ($in =~ /<\/\s*$endtag\s*>/gs)
-	 {
-           $self->{'conn_state'} = $state_recv;
-       } 
-	elsif ($conn->eof)
-	 {
-           $self->report_error(1, 'connection to Netconf server lost');
-       }
+		$in .= $conn->recv();
+		# Check to see if you received the end-tag
+		if ($in =~ /<\/\s*$endtag\s*>/gs)
+		{
+           $self->{'conn_state'} = Net::Netconf::Constants::NC_STATE_HELLO_RECVD;
+		} 
+		elsif ($conn->eof)
+		{
+			$self->report_error(1, 'connection to Netconf server lost');
+			return undef;
+		}
     }
-$self->parse_response($in);
+	
+	return $in;
 }
 
 # Once we receive the response from the server, we call this method before passing
