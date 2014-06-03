@@ -25,9 +25,8 @@ sub start
     my $sshprog;
 
     # Get ssh port number if it exists
-    my $rport = (getservbyname('ssh', 'tcp'))[2];
-    $rport = Net::Netconf::Constants::NC_DEFAULT_PORT unless $self->{'server'}
-    eq 'junoscript';
+	$self->{'port'} = (getservbyname('ssh', 'tcp'))[2] unless defined $self->{'port'};
+    $self->{'port'} = Net::Netconf::Constants::NC_DEFAULT_PORT unless ( defined $self->{'port'} or $self->{'server'} eq 'junoscript' );
 
     $self->{'server'} = 'netconf' unless $self->{'server'};
 
@@ -45,7 +44,7 @@ sub start
 
     # This implementation assumes OpenSSH.
     my $command = $echostate . $sshprog . ' -l ' . 
-                  $self->{'login'} . ' -p ' . $rport . 
+                  $self->{'login'} . ' -p ' . $self->{'port'} . 
                   ' -s ' . $self->{'hostname'} . 
                   ' ' . $self->{'server'};
 
