@@ -12,7 +12,7 @@ sub new
     my $device = undef;
 
     # Junoscript session
-    if ($self->{'server'} eq 'junoscript') {
+    if (defined $self->{'server'} && $self->{'server'} eq 'junoscript') {
         eval 'require JUNOS::Device';
         if ($@) {
             croak 'Error: ' . $@;

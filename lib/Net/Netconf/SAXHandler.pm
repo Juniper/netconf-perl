@@ -12,9 +12,9 @@ $junos_version);
 
 use base qw(XML::SAX::Base);
 
-@parsed_cap;
-$session_id;
-%rpc_errors;
+#@parsed_cap;
+#$session_id;
+#%rpc_errors;
 $found_error = 0;
 $no_error = 0;
 
@@ -57,7 +57,7 @@ sub start_element
     } elsif ($data->{'LocalName'} eq 'rpc-reply') {
         $found_error = 0;
         $no_error = 0;
-        %rpc_errors = undef;
+        %rpc_errors = ();
     } elsif ($data->{'LocalName'} eq 'capability') {
         $self->{'add_capability'} = 1;
     } elsif (($data->{'LocalName'} eq 'session-id') 
