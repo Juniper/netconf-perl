@@ -26,8 +26,7 @@ sub start
 
     # Get ssh port number if it exists
     my $rport = (getservbyname('ssh', 'tcp'))[2];
-    $rport = Net::Netconf::Constants::NC_DEFAULT_PORT unless $self->{'server'}
-    eq 'junoscript';
+    $rport = Net::Netconf::Constants::NC_DEFAULT_PORT unless ( defined $self->{'server'} && $self->{'server'} eq 'junoscript');
 
     $self->{'server'} = 'netconf' unless $self->{'server'};
 
