@@ -120,7 +120,7 @@ my $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
 print "\n reply from server\n";
 
 unless (ref $jnx) {
-    croak "ERROR: $deviceinfo{hostname}: failed to connect.\n";
+    croak "ERROR: $hostname: failed to connect.\n";
 }
 
 my $query = "get_bgp_neighbor_information";
