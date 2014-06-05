@@ -166,15 +166,16 @@ sub get_error_info
 
 # Set AUTOFLUSH to true
 $| = 1;
-
+my %opt;
+our ($opt_x, $opt_t,$opt_s, $opt_l, $opt_p, $opt_h);
 # get the user input and display usage on error 
 # or when user wants help
 getopts('s:l:p:ht:x:') || output_usage();
 output_usage() if $opt_h;
 
-my $hostname = $opt_s;
-my $login= our $opt_l;
-my $pass = our $opt_p;
+my $hostname = $opt_s ||output_usage();
+my $login=  $opt_l ||output_usage();
+my $pass =  $opt_p ||output_usage;
 
 my $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
         'login' => $login,
