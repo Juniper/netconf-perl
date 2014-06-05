@@ -12,9 +12,6 @@ $junos_version);
 
 use base qw(XML::SAX::Base);
 
-#@parsed_cap;
-#$session_id;
-#%rpc_errors;
 $found_error = 0;
 $no_error = 0;
 
