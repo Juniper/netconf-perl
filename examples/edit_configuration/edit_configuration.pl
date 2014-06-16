@@ -1,3 +1,4 @@
+
 ################################################################
 # edit_configuration.pl
 # 
@@ -16,6 +17,7 @@
 
 use Carp;
 use Getopt::Std;
+use Term::ReadKey;
 use Net::Netconf::Manager;
 
 # query execution status constants
@@ -60,13 +62,12 @@ Where:
 
 Options:
 
-s:l:p:t:x:
-  -s <hostname> hostname /server name 
   -l <login>    A login name accepted by the target router
   -p <password> The password for the login name
-  -t            Loading a text configuration 
-  -x            Loading a XML configuration
-   h            help";
+  -m <access>   Access method. Only supported method is 'ssh'
+  -t            Loading a text configuration instead of XML.  See
+                description of <request>
+  -d <level>    Debug level [1-6]\n\n";
 
     croak $usage;
 }
@@ -110,6 +111,7 @@ sub graceful_shutdown
    } else {
        print "REQUEST failed !!\n";
    }
+
    exit;
 }
 
@@ -124,12 +126,16 @@ sub read_xml_file
 {
     my $input_file = shift;
     my $input_string = "";
+
     open(FH, $input_file) || return;
+
     while(<FH>) {
         next if /<\?xml.*\?>/;
         $input_string .= $_;
     }
+
     close(FH);
+
     return $input_string;
 }
 
@@ -142,13 +148,13 @@ sub read_xml_file
 sub get_error_info
 {
     my %error = @_;
+
     print "\nERROR: Printing the server request error ...\n";
 
     # Print 'error-severity' if present
     if ($error{'error_severity'}) {
         print "ERROR SEVERITY: $error{'error_severity'}\n";
     }
-
     # Print 'error-message' if present
     if ($error{'error_message'}) {
         print "ERROR MESSAGE: $error{'error_message'}\n";
@@ -166,76 +172,110 @@ sub get_error_info
 
 # Set AUTOFLUSH to true
 $| = 1;
-my %opt;
-our ($opt_x, $opt_t,$opt_s, $opt_l, $opt_p, $opt_h);
+
 # get the user input and display usage on error 
 # or when user wants help
-getopts('s:l:p:ht:x:') || output_usage();
-output_usage() if $opt_h;
+my %opt;
+getopts('l:p:d:m:ht', \%opt) || output_usage();
+output_usage() if $opt{'h'};
 
-my $hostname = $opt_s ||output_usage();
-my $login=  $opt_l ||output_usage();
-my $pass =  $opt_p ||output_usage;
+# Retrieve command line arguments for the XML file name
+my $xmlfile = shift || output_usage();
 
-my $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
+# Get the hostname
+my $hostname = shift || output_usage();
+
+# Get the access method, can be ssh only
+my $access = $opt{'m'} || 'ssh';
+use constant VALID_ACCESS_METHOD => 'ssh';
+output_usage() unless (VALID_ACCESS_METHOD =~ /$access/);
+
+# Get the debug level
+my $debug_level = $opt{'d'};
+
+# Check for login name. If not provided, prompt for it
+my $login = "";
+if ($opt{'l'}) {
+    $login = $opt{'l'};
+} else {
+    print STDERR "login: ";
+    $login = ReadLine 0;
+    chomp $login;
+}
+
+# Check for password. If not provided, prompt for it
+my $password = "";
+if ($opt{'p'}) {
+    $password = $opt{'p'};
+} else {
+    print STDERR "password: ";
+    ReadMode 'noecho';
+    $password = ReadLine 0;
+    chomp $password;
+    ReadMode 'normal';
+    print STDERR "\n";
+}
+
+# Now create the device information to send to Net::Netconf::Manager
+my %deviceinfo = ( 
+        'access' => $access,
         'login' => $login,
-        'password' => $pass,
-        'hostname' => $hostname);
-print "\n reply from server\n";
+        'password' => $password,
+        'hostname' => $hostname,
+);
 
+if ($debug_level) {
+    $deviceinfo{'debug_level'} = $debug_level;
+}
+
+my $res; # Netconf server response
+
+# connect to the Netconf server
+my $jnx = new Net::Netconf::Manager(%deviceinfo);
 unless (ref $jnx) {
-    croak "ERROR: $hostname: failed to connect.\n";
+    croak "ERROR: $deviceinfo{hostname}: failed to connect.\n";
 }
 
 # Lock the configuration database before making any changes
 print "Locking configuration database ...\n";
 my %queryargs = ( 'target' => 'candidate' );
-
 $res = $jnx->lock_config(%queryargs);
-print "\nlock-reply from server $res \n";
-
 # See if you got an error
 if ($jnx->has_error) {
     print "ERROR: in processing request \n $jnx->{'request'} \n";
     graceful_shutdown($jnx, STATE_CONNECTED, REPORT_FAILURE);
 }
 
+# Load the configuration from the given XML file
+print "Loading configuration from $xmlfile \n";
+if (! -f $xmlfile) {
+    print "ERROR: Cannot load configuration in $xmlfile\n";
+    graceful_shutdown($jnx, STATE_LOCKED, REPORT_FAILURE);    
+}
+
+# Read in the XML file
+my $config = read_xml_file($xmlfile);
+print "\n\n$config \n\n";
+
 %queryargs = ( 
                  'target' => 'candidate'
              );
 
-#Check we are in xml mode
-if ($opt_x)
-{
-my $xmlfile =$opt_x;
-my $config = read_xml_file($xmlfile);
-$queryargs{'config'} = $config;
-
-}
-
-# If we are in text mode, use config-text arg with wrapped configuration-text
-if ($opt_t) 
-{
-my $text_file = $opt_t;
-my $config1="";
-open(FH, $text_file) ||return;
-
-while(<FH>)
-{
-$config1.=$_;
-}
-close(FH);
-
-$queryargs{'config-text'} = '<configuration-text>' . $config1
+# If we are in text mode, use config-text arg with wrapped
+# configuration-text, otherwise use config arg with raw
+# XML
+if ($opt{t}) {
+  $queryargs{'config-text'} = '<configuration-text>' . $config
     . '</configuration-text>';
-} 
+} else {
+  $queryargs{'config'} = $config;
+}
 
 $res = $jnx->edit_config(%queryargs);
-print "\nedit_config reply from server $res \n";
 
 # See if you got an error
 if ($jnx->has_error) {
-    print "ERROR: in processing request\n";
+    print "ERROR: in processing request \n $jnx->{'request'} \n";
     # Get the error
     my $error = $jnx->get_first_error();
     get_error_info(%$error);
@@ -245,8 +285,7 @@ if ($jnx->has_error) {
 
 # Commit the changes
 print "Committing the <edit-config> changes ...\n";
-$com=$jnx->commit();
-print "\n commit reply from server $com \n\n";
+$jnx->commit();
 if ($jnx->has_error) {
     print "ERROR: Failed to commit the configuration.\n";
     graceful_shutdown($jnx, STATE_CONFIG_LOADED, REPORT_FAILURE);
