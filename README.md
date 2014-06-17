@@ -81,17 +81,17 @@ For more info look at the Troubleshooting
 
 Installation
 =============
-        Make sure Perl is installed. If necessary, see Installation of Perl.
+
+            Make sure Perl is installed. If necessary, see Installation of Perl.
             % which perl
             % perl -v
             The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify that you are running
             that version of the perl executable. If not, check your PATH or install the latest release of perl.
-
+            
         There are two ways to install Net::Netconf Module in your system:
         1. Using CPAN
         2. Using source code in github
-        
-Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be installed by cpan        
+    Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be installed by cpan        
         Using CPAN
         =========
         Before installing using cpan, make sure your system has cpan, if not then install it either by "apt-get install cpan" or "yum install cpan" (according to the OS you are using)
@@ -101,9 +101,9 @@ Note: If you are using cpan command then you don't have to install prerequisites
        
         Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your system by "apt-get install cpanmius"  and then install this module by "cpanm Net::Netconf"
         Instructions for UNIX Systems
-
-   Using Source code in github
-   ===========================
+        
+        Using Source code in github
+        ===========================
        
         Install the prerequisites of Perl modules. 
         Following are the prerequites
@@ -133,6 +133,7 @@ Note: If you are using cpan command then you don't have to install prerequisites
             [/my/netconf-perl-master]% make
             [/my/netconf-perl--master]% make install
             (to run make install user should have root permission)
+            
 Running the Sample Scripts
 ==========================
 
