@@ -85,26 +85,33 @@ Installation
     Make sure Perl is installed. If necessary, see Installation of Perl.
     % which perl
     % perl -v
-    The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify that you are running
-    that version of the perl executable. If not, check your PATH or install the latest release of perl.
+    The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify 
+    that you are running that version of the perl executable. If not, check your PATH or 
+    install the latest release of perl.
             
         There are two ways to install Net::Netconf Module in your system:
         1. Using CPAN
         2. Using source code in github
-    Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be installed by cpan        
+    Note: If you are using cpan command then you don't have to install prerequisites, they 
+    will automatically be installed by cpan        
      
         Using CPAN
         -----------------------------------------------------------------------------------------
-        Before installing using cpan, make sure your system has cpan, if not then install it either by "apt-get install cpan" or "yum install cpan" (according to the OS you are using)
-        1. To install using CPAN make sure your system has C dependencies, i.e. libxml2 and libxml2-dev package.
-        2. After installing these two packages in your system install Net::Netconf module by using CPAN command
-        "cpan Net::Netconf".
+        Before installing using cpan, make sure your system has cpan, if not then install it 
+        either by "apt-get install cpan" or "yum install cpan" (according to the OS you are using)
+        1. To install using CPAN make sure your system has C dependencies, i.e. libxml2 and 
+        libxml2-dev package.
+        2. After installing these two packages in your system install Net::Netconf module by using 
+        CPAN command "cpan Net::Netconf".
        
-        Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your system by "apt-get install cpanmius"  and then install this module by "cpanm Net::Netconf"
-        Instructions for UNIX Systems
+        Sometimes cpan command gives error then try installing using "cpanm" command. First install 
+        cpanm in your system by "apt-get install cpanmius"  and then install this module by 
+        "cpanm Net::Netconf"
         
         Using Source code in github
         --------------------------------------------------------------------------------------------
+        Instructions for UNIX Systems
+        
         Install the prerequisites of Perl modules. 
         Following are the prerequites
         1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
@@ -137,10 +144,12 @@ Installation
 Running the Sample Scripts
 ==========================
 
-The NETCONF Perl distribution includes sample scripts that demonstrate how to use NETCONF to retrieve and change the configuration of a Networks routing platform. The samples reside in the netconf-perl-n.n/examples directory.
+The NETCONF Perl distribution includes sample scripts that demonstrate how to use NETCONF to retrieve 
+and change the configuration of a Networks routing platform. The samples reside in the netconf-perl-n.n/examples directory.
 
 Reading configuration: System Information
-This example sends a <get-system-information> request to the Networks routing platform and displays the result to the standard output.It also shows how to parse reply from server
+This example sends a <get-system-information> request to the Networks routing platform and displays the
+result to the standard output.It also shows how to parse reply from server
 
             use Net::Netconf::Manager;
             print "Enter hostname\n";
