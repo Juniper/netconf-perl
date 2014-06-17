@@ -81,15 +81,30 @@ For more info look at the Troubleshooting
 
 Installation
 =============
-        Instructions for UNIX Systems
-
-         1. Make sure Perl is installed. If necessary, see Installation of
-            Perl.
+        Make sure Perl is installed. If necessary, see Installation of Perl.
             % which perl
             % perl -v
-            The NETCONF Perl Client requires version 5.6.1 or later of the perl executable. Verify that you are running
+            The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify that you are running
             that version of the perl executable. If not, check your PATH or install the latest release of perl.
 
+        There are two ways to install Net::Netconf Module in your system:
+        1. Using CPAN
+        2. Using source code in github
+        
+Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be installed by cpan        
+        Using CPAN
+        =========
+        Before installing using cpan, make sure your system has cpan, if not then install it either by "apt-get install cpan" or "yum install cpan" (according to the OS you are using)
+        1. To install using CPAN make sure your system has C dependencies, i.e. libxml2 and libxml2-dev package.
+        2. After installing these two packages in your system install Net::Netconf module by using CPAN command
+        "cpan Net::Netconf".
+       
+        Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your system by "apt-get install cpanmius"  and then install this module by "cpanm Net::Netconf"
+        Instructions for UNIX Systems
+
+   Using Source code in github
+   ===========================
+       
         Install the prerequisites of Perl modules. 
         Following are the prerequites
         1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
@@ -106,7 +121,6 @@ Installation
         After successfully installing Prerequisites install NETCONF PERL CLIENT
           
         1. Download the Perl NETCONF zip archive from Juniper's Repository in github 
-            
         2. Unzip the archive.
             % unzip netconf-Perl-master.zip
         3. Change to the NETCONF directory.
@@ -115,8 +129,7 @@ Installation
            If installing Net::Netconf::Manager under the standard directory
             (by default it is /usr/local/lib):
             [/my/netconf-perl-master]% perl Makefile.PL
-             
-         6. Install the Net::Netconf module.
+        5. Install the Net::Netconf module.
             [/my/netconf-perl-master]% make
             [/my/netconf-perl--master]% make install
             (to run make install user should have root permission)
@@ -187,7 +200,9 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
          Install these packages in your system :
             dpkg -i libxml2_2.7xyz__.dpkg
             dpkg -i libxml2-dev_2xyz__.dpkg
-             
+            
+Note : Libxml2 and libxml2-dev should be of same version
+
     If you get libxml related error even after installing its dependency like libxml2 and libxml2-dev then try 
     below  command
             apt-get install libxml-libxml-perl
