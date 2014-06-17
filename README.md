@@ -7,7 +7,6 @@ NETCONF Perl client
          * Downloads
          * Installation
          * Running the Sample Scripts
-         
 
 Abstract
 ========
@@ -56,7 +55,6 @@ Abstract
      # Step 6: always disconnect from the server when you're done
      $jnx->disconnect();
 
-
 Supported Platforms
 ===================
 
@@ -74,7 +72,6 @@ Prerequisites
        1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
        2. File::Which
        3. XML::LibXML
-
 
 Also make sure that your system has libxml2 and libxml2-dev library. If not then either install it from source package in ubuntu website or by using apt-get. 
 For more info look at the Troubleshooting 
@@ -108,7 +105,6 @@ Installation
         Using Source code in github
         --------------------------------------------------------------------------------------------
         Instructions for UNIX Systems
-        
         Install the prerequisites of Perl modules. 
         Following are the prerequites
         1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
@@ -192,8 +188,9 @@ result to the standard output.It also shows how to parse reply from server
              print "host-name  ". $res3. "\n";
              $jnx->disconnect();
 
-Troubleshooting  (Ubuntu12.04LTS or higher version)           
+Troubleshooting  (Ubuntu12.04LTS or higher version) 
 =================
+
     1. Installing libxml2 and libxml2-dev 
        - Install using apt-get
             apt-get install libxml2
@@ -208,13 +205,12 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
             dpkg -i libxml2_2.7xyz__.dpkg
             dpkg -i libxml2-dev_2xyz__.dpkg
             
-Note : Libxml2 and libxml2-dev should be of same version
-
+      Note : Libxml2 and libxml2-dev should be of same version
+      
     If you get libxml related error even after installing its dependency like libxml2 and libxml2-dev then try 
     below  command
             apt-get install libxml-libxml-perl
-       
-         
+      
     2. For YAML related Errors
        Sometimes you may get that yaml is not installed then run following commands:
              apt-get install libyaml-appconfig-perl
