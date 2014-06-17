@@ -221,13 +221,15 @@ Note : Libxml2 and libxml2-dev should be of same version
              apt-get install libconfig-yaml-perl
         
     3. For cpan related errors:
-       While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch for distribution, then try installing that package using "cpanm"
+       While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch
+       for distribution, then try installing that package using "cpanm"
        First install cpanm in your system by:
        apt-get install cpanminus
        and then install desired package by using cpanm, for example:
        cpanm File::Which
        
-       While installing perl dependency using cpan, if you get errors like "XML::NamespaceSupport package not found" or unmet dependency then first install that package using cpan / cpanm and then install your desired package.
+       While installing perl dependency using cpan, if you get errors like "XML::NamespaceSupport package not found" or
+       unmet dependency then first install that package using cpan / cpanm and then install your desired package.
        you can also try installing by force :
        apt-get -f install
              
