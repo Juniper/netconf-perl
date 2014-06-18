@@ -4,9 +4,10 @@ NETCONF Perl client
        Contents
          * Abstract
          * Supported Platforms
-         * Downloads
+         * Prerequisites
          * Installation
          * Running the Sample Scripts
+         * Troubleshooting
 
 Abstract
 ========
