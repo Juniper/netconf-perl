@@ -4,10 +4,10 @@ NETCONF Perl client
        Contents
          * Abstract
          * Supported Platforms
-         * Downloads
+         * Prerequisites
          * Installation
          * Running the Sample Scripts
-         
+         * Troubleshooting
 
 Abstract
 ========
@@ -56,7 +56,6 @@ Abstract
      # Step 6: always disconnect from the server when you're done
      $jnx->disconnect();
 
-
 Supported Platforms
 ===================
 
@@ -75,21 +74,38 @@ Prerequisites
        2. File::Which
        3. XML::LibXML
 
-
 Also make sure that your system has libxml2 and libxml2-dev library. If not then either install it from source package in ubuntu website or by using apt-get. 
 For more info look at the Troubleshooting 
 
 Installation
 =============
+
+    Make sure Perl is installed. If necessary, see Installation of Perl.
+    % which perl
+    % perl -v
+    The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify that you are running 
+    that version of the perl executable. If not, check your PATH or install the latest release of perl.
+            
+        There are two ways to install Net::Netconf Module in your system:
+        1. Using CPAN
+        2. Using source code in github
+    Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be
+    installed by cpan        
+     
+        Using CPAN
+        -----------------------------------------------------------------------------------------
+        Before installing using cpan, make sure your system has cpan, if not then install it either by "apt-get 
+        install cpan" or "yum install cpan" (according to the OS you are using)
+        1. To install using CPAN make sure your system has C dependencies, i.e. libxml2 and libxml2-dev package.
+        2. After installing these two packages in your system install Net::Netconf module by using CPAN command 
+        "cpan Net::Netconf". 
+       
+        Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your 
+        system by "apt-get install cpanmius"  and then install this module by "cpanm Net::Netconf"
+        
+        Using Source code in github
+        --------------------------------------------------------------------------------------------
         Instructions for UNIX Systems
-
-         1. Make sure Perl is installed. If necessary, see Installation of
-            Perl.
-            % which perl
-            % perl -v
-            The NETCONF Perl Client requires version 5.6.1 or later of the perl executable. Verify that you are running
-            that version of the perl executable. If not, check your PATH or install the latest release of perl.
-
         Install the prerequisites of Perl modules. 
         Following are the prerequites
         1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
@@ -106,7 +122,6 @@ Installation
         After successfully installing Prerequisites install NETCONF PERL CLIENT
           
         1. Download the Perl NETCONF zip archive from Juniper's Repository in github 
-            
         2. Unzip the archive.
             % unzip netconf-Perl-master.zip
         3. Change to the NETCONF directory.
@@ -115,18 +130,20 @@ Installation
            If installing Net::Netconf::Manager under the standard directory
             (by default it is /usr/local/lib):
             [/my/netconf-perl-master]% perl Makefile.PL
-             
-         6. Install the Net::Netconf module.
+        5. Install the Net::Netconf module.
             [/my/netconf-perl-master]% make
             [/my/netconf-perl--master]% make install
             (to run make install user should have root permission)
+            
 Running the Sample Scripts
 ==========================
 
-The NETCONF Perl distribution includes sample scripts that demonstrate how to use NETCONF to retrieve and change the configuration of a Networks routing platform. The samples reside in the netconf-perl-n.n/examples directory.
+The NETCONF Perl distribution includes sample scripts that demonstrate how to use NETCONF to retrieve 
+and change the configuration of a Networks routing platform. The samples reside in the netconf-perl-n.n/examples directory.
 
 Reading configuration: System Information
-This example sends a <get-system-information> request to the Networks routing platform and displays the result to the standard output.It also shows how to parse reply from server
+This example sends a <get-system-information> request to the Networks routing platform and displays the
+result to the standard output.It also shows how to parse reply from server
 
             use Net::Netconf::Manager;
             print "Enter hostname\n";
@@ -172,8 +189,9 @@ This example sends a <get-system-information> request to the Networks routing pl
              print "host-name  ". $res3. "\n";
              $jnx->disconnect();
 
-Troubleshooting  (Ubuntu12.04LTS or higher version)           
+Troubleshooting  (Ubuntu12.04LTS or higher version) 
 =================
+
     1. Installing libxml2 and libxml2-dev 
        - Install using apt-get
             apt-get install libxml2
@@ -187,25 +205,28 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
          Install these packages in your system :
             dpkg -i libxml2_2.7xyz__.dpkg
             dpkg -i libxml2-dev_2xyz__.dpkg
-             
+            
+      Note : Libxml2 and libxml2-dev should be of same version
+      
     If you get libxml related error even after installing its dependency like libxml2 and libxml2-dev then try 
     below  command
             apt-get install libxml-libxml-perl
-       
-         
+      
     2. For YAML related Errors
        Sometimes you may get that yaml is not installed then run following commands:
              apt-get install libyaml-appconfig-perl
              apt-get install libconfig-yaml-perl
         
     3. For cpan related errors:
-       While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch for distribution, then try installing that package using "cpanm"
+       While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch
+       for distribution, then try installing that package using "cpanm"
        First install cpanm in your system by:
        apt-get install cpanminus
        and then install desired package by using cpanm, for example:
        cpanm File::Which
        
-       While installing perl dependency using cpan, if you get errors like "XML::NamespaceSupport package not found" or unmet dependency then first install that package using cpan / cpanm and then install your desired package.
+       While installing perl dependency using cpan, if you get errors like "XML::NamespaceSupport package not found" or
+       unmet dependency then first install that package using cpan / cpanm and then install your desired package.
        you can also try installing by force :
        apt-get -f install
              
