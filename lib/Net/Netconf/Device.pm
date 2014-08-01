@@ -85,6 +85,9 @@ my %methods = (
        'confirmed' => $TOGGLE,
        'confirm_timeout' => $STRING
    },
+   'commit_configuration' => {
+	'check'=>$TOGGLE,
+   },
    'validate' => {
         'source' => $DOM_STRING,
         'source_url' => $URL_STRING,
