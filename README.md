@@ -211,6 +211,10 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
     If you get libxml related error even after installing its dependency like libxml2 and libxml2-dev then try 
     below  command
             apt-get install libxml-libxml-perl
+            
+    Sometimes you may get error like "Checking for ability to link against xml2...no " while installing LibXML then 
+    use this command
+          sudo apt-get install zlib1g-dev
       
     2. For YAML related Errors
        Sometimes you may get that yaml is not installed then run following commands:
