@@ -545,8 +545,15 @@ sub generate_rpc
         else {
 	$output = "<rpc message-id=\'$msg_id\'>\n  <${tag}${attrs}/>\n</rpc>\n";
     }
-       $self->{'request'} = $output;
-       $self->send_and_recv_rpc($output);
+       $self->{'request'} = $output;      
+       my $response = $self->send_and_recv_rpc($output);
+       my $traceobj = $self->{'trace_obj'};
+       $traceobj->trace(Net::Netconf::Trace::DEBUG_LEVEL,<<EOF);
+       SERVER REQUEST:
+       $output
+       SERVER RESPONSE:
+       $response
+EOF
 }
 
 # This will be removed after the <get-config> accepts parameters in any order
