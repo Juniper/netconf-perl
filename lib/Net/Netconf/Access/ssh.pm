@@ -23,7 +23,7 @@ sub start
 {
     my($self) = @_;
     my $sshprog;
-
+    my $exp;
     # Get ssh port number if it exists
     my $rport = (getservbyname('ssh', 'tcp'))[2];
     $rport = Net::Netconf::Constants::NC_DEFAULT_PORT unless ( defined $self->{'server'} && $self->{'server'} eq 'junoscript');
@@ -50,9 +50,14 @@ sub start
 
     
     # take expect object from user ow build your own
-    my $exp = new Expect unless ($self->{'exp_obj'});
+    if (defined $self->{'exp_obj'}){
+        $exp = $self->{'exp_obj'};
+    }
+    else{
+        $exp = new Expect;
+    }
     my $ssh=$exp->spawn($command);
-
+    
     # Create the Expect object
     # my $ssh = Expect->spawn($command); 
     # Turn off logging to stdout
