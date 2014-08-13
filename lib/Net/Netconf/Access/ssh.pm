@@ -48,8 +48,13 @@ sub start
                   ' -s ' . $self->{'hostname'} . 
                   ' ' . $self->{'server'};
 
+    
+    # take expect object from user ow build your own
+    my $exp = new Expect unless ($self->{'exp_obj'});
+    my $ssh=$exp->spawn($command);
+
     # Create the Expect object
-    my $ssh = Expect->spawn($command); 
+    # my $ssh = Expect->spawn($command); 
     # Turn off logging to stdout
     $ssh->log_stdout(0);
     $ssh->log_file($self->out);
