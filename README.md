@@ -234,3 +234,8 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
        you can also try installing by force :
        apt-get -f install
              
+
+# CONTRIBUTORS
+
+ - [Ganesh Nalawade](https://github.com/ganeshnalawade)
+ - [Priyal Jain](https://github.com/Jainpriyal)
