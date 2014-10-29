@@ -43,11 +43,23 @@ sub start
     }
 
     # This implementation assumes OpenSSH.
-    my $command = $echostate . $sshprog . ' -l ' . 
-                  $self->{'login'} . ' -p ' . $rport . 
-                  ' -s ' . $self->{'hostname'} . 
+
+    ## Lets try get some ssh key auth going 
+    our $command;
+	if ( defined( $self->{'keyfile'} ) )  {
+          $command = $echostate . $sshprog . ' -l ' .
+                  $self->{'login'} . ' -p ' . $rport .
+		  ' -i ' . $self->{'keyfile'} . 
+                  ' -s ' . $self->{'hostname'} .
                   ' ' . $self->{'server'};
 
+        } 
+       else  {
+        $command = $echostate . $sshprog . ' -l ' . 
+                      $self->{'login'} . ' -p ' . $rport . 
+                      ' -s ' . $self->{'hostname'} . 
+                      ' ' . $self->{'server'};
+      } 
     
     # take expect object from user ow build your own
     if (defined $self->{'exp_obj'}){
