@@ -239,3 +239,4 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
 
  - [Ganesh Nalawade](https://github.com/ganeshnalawade)
  - [Priyal Jain](https://github.com/Jainpriyal)
+ - [Ruairi Carroll](https://github.com/rucarrol)
