@@ -1,143 +1,114 @@
-# child of Access
-
 package Net::Netconf::Access::ssh;
 
-use Expect;
+use Net::SSH2;
 use Net::Netconf::Trace;
-use Net::Netconf::Access;
 use Net::Netconf::Constants;
 use Carp;
-use File::Which;
-our $VERSION ='0.01';
 
-use vars qw(@ISA);
-@ISA = qw(Net::Netconf::Access);
+use parent 'Net::Netconf::Access';
 
-sub disconnect
-{
-    my ($self) = shift;
-    $self->{'ssh_obj'}->hard_close();
-}
+our $VERSION = '1.0';
 
-sub start
-{
-    my($self) = @_;
-    my $sshprog;
-    my $exp;
-    # Get ssh port number if it exists
-    my $rport = (getservbyname('ssh', 'tcp'))[2];
-    $rport = Net::Netconf::Constants::NC_DEFAULT_PORT unless ( defined $self->{'server'} && $self->{'server'} eq 'junoscript');
-
-    $self->{'server'} = 'netconf' unless $self->{'server'};
-
-    my $echostate = 'stty -echo;';
-    if (exists($self->{'sshprog'})) {
-        $sshprog = $self->{'sshprog'};
-    } else {
-        $sshprog = which('ssh');
-        if (defined($sshprog) && ($sshprog ne '')) {
-            chomp($sshprog);
-        } else {
-            croak "Could not find sshclient on the system";
-        }
-    }
-
-    # This implementation assumes OpenSSH.
-    my $command = $echostate . $sshprog . ' -l ' . 
-                  $self->{'login'} . ' -p ' . $rport . 
-                  ' -s ' . $self->{'hostname'} . 
-                  ' ' . $self->{'server'};
-
-    
-    # take expect object from user ow build your own
-    if (defined $self->{'exp_obj'}){
-        $exp = $self->{'exp_obj'};
-    }
-    else{
-        $exp = new Expect;
-    }
-    my $ssh=$exp->spawn($command);
-    
-    # Create the Expect object
-    # my $ssh = Expect->spawn($command); 
-    # Turn off logging to stdout
-    $ssh->log_stdout(0);
-    $ssh->log_file($self->out);
-
-    # Send our password or passphrase
-    if ($ssh->expect(10, 'password:', 'Password:', '(yes/no)?', '-re', 'passphrase.*:')) {
-	my $m_num = $ssh->match_number();
-	 
-        SWITCH: {
-	      if (($m_num == 1) || ($m_num == 2) || ($m_num == 4)) {
-	          print $ssh "$self->{'password'}\r"; 
-                  last SWITCH;
-	      }
-	      if ($m_num == 3) {
-                  # Host-key authenticity.
-                  print $ssh "yes\r";
-	          if ($ssh->expect(10, 'password:', 'Password:', '-re', 'passphrase.*:')) {
-		      print $ssh "$self->{'password'}\r";
-	          } 
-	          # After the yes/no option, expect the line: 'Warning: 
-	          # Permanently added <....> to the list of known hosts.' 
-	          $ssh->expect(10, 'known hosts.'); 
-	          last SWITCH;
-	      }
-	} # SWITCH   
-	# If password prompted second time, it means user has give invalid password
-        if ($ssh->expect(10, 'password:', 'Password:', '-re', 'passphrase.*:'))
-        {
-            print "Failed to login to $self->{'hostname'}\n";
-            $self->{'seen_eof'} = 1;
-        }
-    } 
-    else {
-	if ($ssh->expect(10, '-re', '<!(.*?)>')) {
-	    # Things are good. Do nothing.
-	} else {    
-	    $self->{'seen_eof'} = 1;
-	}
-    }
-
-    $self->{'ssh_obj'} = $ssh;
-    $self;
-}
-
-sub send
-{
-    my ($self, $xml) = @_;
-    my $ssh = $self->{'ssh_obj'};
-    $xml .= ']]>]]>';
-    print $ssh "$xml\r";
-    1;
-}
-
-sub recv
-{
+# Just for convenience
+sub trace {
     my $self = shift;
-    my $xml;
-    my $ssh = $self->{'ssh_obj'};
-    if ($ssh->expect(600, ']]>]]>')) {
-        $xml = $ssh->before() . $ssh->match();
-    } else {
-        print "Failed to login to $self->{'hostname'}\n";
-        $self->{'seen_eof'} = 1;
-    }
-    $xml =~ s/]]>]]>//g;
-    $xml;
+    $self->{'trace_obj'}->trace(Net::Netconf::Trace::TRACE_LEVEL,
+                                sprintf("[%s] %s", __PACKAGE__, @_));
 }
 
-sub out
-{
-    my $self = @_;
-    foreach $line (@_) {
-        if ($line =~ /Permission\ denied/) {
-          print "Login failed: Permission Denied\n";
-          $self->{'ssh_obj'}->hard_close();
-          $self->{'seen_eof'} = 1;
-        }
-    }
+# Initialises an Net::SSH2 object, connects and authenticates to the Netconf
+# server. Net::SSH2 object is stored in $self->{'ssh2'}, channel in
+# $self->{'chan'}.
+sub start {
+    my $self = shift;
+
+    my $port = ($self->{'server'} eq 'netconf') ?
+               Net::Netconf::Constants::NC_DEFAULT_PORT :
+               (getservbyname('ssh', 'tcp'))[2];
+
+    my $ssh2 = Net::SSH2->new();
+    croak "Failed to create a new Net::SSH2 object" unless(ref $ssh2);
+
+    $self->trace("Making SSH connection to '$self->{'hostname'}:$port'...");
+    $ssh2->connect($self->{'hostname'}, $port);
+    croak "SSH connection failed: " . $ssh2->error() if($ssh2->error());
+    $self->trace("SSH connection succeeded!");
+
+    $self->trace("Performing SSH authentication");
+    $ssh2->auth(username => $self->{'login'},
+                password => $self->{'password'});
+    croak "SSH authentication failed" if(!$ssh2->auth_ok() or $ssh2->error());
+    $self->trace("Authentication succeeded!");
+
+    $self->trace("Requesting SSH channel...");
+    my $chan = $ssh2->channel();
+    croak "Failed to create SSH channel" if(!ref $chan or $ssh2->error());
+    $self->trace("Successfully created SSH channel!");
+
+    $self->trace("Starting subsystem '$self->{'server'}'...");
+    $chan->subsystem($self->{'server'})
+        or croak "Failed to start subsystem '$self->{'server'}'";
+    $self->trace("Successfully started subsystem!");
+
+    # Allow partial reads from the channel in recv(), otherwise it will
+    # just sit there waiting for the buffer to fill completely
+    $chan->blocking(0);
+
+    $self->{'ssh2'} = $ssh2;
+    $self->{'chan'} = $chan;
+    return $self;
+}
+
+# Gracefully disconnect from Netconf server
+sub disconnect {
+    my $self = shift;
+
+    my $ssh2 = $self->{'ssh2'};
+    $ssh2->disconnect("Bye bye from $0 [" . __PACKAGE__ . " v$VERSION]");
+    $self->trace("Disconnected from SSH server");
+
+    undef $self;
+}
+
+# Writes an XML request to the Netconf server.
+sub send {
+    my ($self, $xml) = @_;
+
+    $self->trace("Writing '$xml' to SSH channel...");
+    $self->{'chan'}->write($xml . ']]>]]>')
+        or croak "Failed to write XML data to SSH channel!";
+    $self->trace("Succeeded writing to SSH channel!");
+
+    return 1;
+}
+
+# Reads an XML reply from the Netconf server.
+sub recv {
+    my $self = shift;
+    my $ssh2 = $self->{'ssh2'};
+    my $chan = $self->{'chan'};
+
+    $self->trace("Reading XML response from Netconf server...");
+    my ($resp, $buf);
+    do {
+        # Wait up to 10 seconds for data to become available before attempting
+        # to read anything (in order to avoid busy-looping on $chan->read())
+        my @poll = ({ handle => $chan, events => 'in' });
+        $ssh2->poll(10000, \@poll);
+
+        $nbytes = $chan->read($buf, 65536) || 0;
+        $self->trace("Read $nbytes bytes from SSH channel: '$buf'");
+        $resp .= $buf;
+    } until($resp =~ s/]]>]]>$//);
+    $self->trace("Received XML response '$resp'");
+
+    return $resp;
+}
+
+# Checks if the server sent us an EOF
+sub eof {
+    my $self = shift;
+    return $self->{'chan'}->eof();
 }
 
 1;
@@ -150,14 +121,14 @@ Net::Netconf::Access::ssh
 
 =head1 SYNOPSIS
 
-The Net::Netconf::Access::ssh module is used internally to provide ssh access to
-a Net::Netconf::Access instance.
+The Net::Netconf::Access::ssh module is used internally to provide SSH access to
+a Net::Netconf::Access instance, using Net::SSH2.
 
 =head1 DESCRIPTION
 
-This is a subclass of Net::Netconf::Access class that manages an ssh connection
-with the destination host. The underlying mechanics for managing the ssh
-connection is based on OpenSSH.
+This is a subclass of Net::Netconf::Access class that manages an SSH connection
+with the destination host. The underlying mechanics for managing the SSH
+connection is based on Net::SSH2.
 
 =head1 CONSTRUCTOR
 
@@ -171,7 +142,11 @@ Please refer to the constructor of Net::Netconf::Access class.
 
 =item *
 
-Expect.pm
+Net::SSH2
+
+=item *
+
+Net::SSH2::Channel
 
 =item *
 
@@ -189,6 +164,9 @@ Net::Netconf::Device
 
 =head1 AUTHOR
 
-Juniper Networks Perl Team, send bug reports, hints, tips and suggestions to
-netconf-support@juniper.net.
+Tore Anderson <tore@redpill-linpro.com>
 
+Net::Netconf is maintained by the Juniper Networks Perl Team, send bug reports,
+hints, tips and suggestions to netconf-support@juniper.net.
+
+# vim: syntax=perl tw=80 ts=4 et:
