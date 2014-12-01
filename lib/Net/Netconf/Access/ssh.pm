@@ -50,10 +50,6 @@ sub start {
         or croak "Failed to start subsystem '$self->{'server'}'";
     $self->trace("Successfully started subsystem!");
 
-    # Allow partial reads from the channel in recv(), otherwise it will
-    # just sit there waiting for the buffer to fill completely
-    $chan->blocking(0);
-
     $self->{'ssh2'} = $ssh2;
     $self->{'chan'} = $chan;
     return $self;
@@ -74,11 +70,26 @@ sub disconnect {
 sub send {
     my ($self, $xml) = @_;
 
-    $self->trace("Writing '$xml' to SSH channel...");
-    $self->{'chan'}->write($xml . ']]>]]>')
-        or croak "Failed to write XML data to SSH channel!";
-    $self->trace("Succeeded writing to SSH channel!");
+    $xml .= ']]>]]>';
 
+    my $len = length($xml);
+
+    $self->trace("Will write $len bytes to the SSH channel:");
+    $self->trace("$xml");
+
+    # Make the channel blocking, so the write() call below waits until there
+    # is available buffer space. Otherwise we'll end up busy-looping.
+    $self->{'chan'}->blocking(1);
+
+    my $written = 0;
+    while($written != $len) {
+        my $nbytes = $self->{'chan'}->write($xml)
+            or croak "Failed to write XML data to SSH channel!";
+        $written += $nbytes;
+        $self->trace("Wrote $nbytes bytes (total written: $written).");
+        substr($xml, 0, $nbytes) = '';
+    }
+    $self->trace("Successfully wrote $written bytes to SSH channel!");
     return 1;
 }
 
@@ -87,6 +98,12 @@ sub recv {
     my $self = shift;
     my $ssh2 = $self->{'ssh2'};
     my $chan = $self->{'chan'};
+
+    # Make the channel non-blocking, so that read() below allows for partial
+    # reads (as we can't possibly know if the data we're about to receive is an
+    # exact multiple of the buffer size argument, and doing it one character at
+    # a time instead would be terribly inefficient).
+    $chan->blocking(0);
 
     $self->trace("Reading XML response from Netconf server...");
     my ($resp, $buf);
