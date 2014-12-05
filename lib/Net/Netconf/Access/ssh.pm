@@ -22,6 +22,8 @@ sub trace {
 sub start {
     my $self = shift;
 
+    $self->{'server'} ||= 'netconf';
+
     my $port = ($self->{'server'} eq 'netconf') ?
                Net::Netconf::Constants::NC_DEFAULT_PORT :
                (getservbyname('ssh', 'tcp'))[2];
