@@ -1,6 +1,6 @@
 package Net::Netconf::Constants;
 
-our $VERSION ='0.01';
+our $VERSION ='1.00';
 # Netconf server: minimum version
 use constant NC_VERS_MIN => 7.5;
 # Constants pertaining to the Netconf states
