@@ -3,7 +3,7 @@ package Net::Netconf::Access;
 use strict;
 use Net::Netconf::Trace;
 use Carp;
-our $VERSION ='0.01';
+our $VERSION ='1.00';
 
 sub new
 {
