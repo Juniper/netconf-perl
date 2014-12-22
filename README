@@ -70,7 +70,7 @@ Prerequisites
 ==============
 
     Following are the Prerequisites for using this API:
-       1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
+       1. Net::SSH2
        2. File::Which
        3. XML::LibXML
 
@@ -108,16 +108,14 @@ Installation
         Instructions for UNIX Systems
         Install the prerequisites of Perl modules. 
         Following are the prerequites
-        1. Expect Module (it depends on tcl, tk, tcl-dev and tk-dev)
+        1. Net::SSH2
         2. File::Which
         3. XML::LibXML
         
         Steps to install Prerequisites in Ubuntu12.04LTS :
-        1. apt-get install tcl tcl-dev tk tk-dev
-        2. apt-get install expect expect-dev
-        3. cpan Expect
-        4. cpan File::Which
-        5. cpan XML::LibXML
+        1. cpan Net::SSH2
+        2. cpan File::Which
+        3. cpan XML::LibXML
             
         After successfully installing Prerequisites install NETCONF PERL CLIENT
           
