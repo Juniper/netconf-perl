@@ -7,7 +7,7 @@ use Carp;
 
 use parent 'Net::Netconf::Access';
 
-our $VERSION = '1.0';
+our $VERSION = '1.00';
 
 # Just for convenience
 sub trace {
