@@ -1,7 +1,7 @@
 package Net::Netconf::Manager;
 
 use Carp;
-our $VERSION ='0.01';
+our $VERSION ='1.00';
 
 # This instantiates a Junoscript or a Netconf device depending on the 'server'
 # specified. Default is Netconf.
