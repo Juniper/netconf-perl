@@ -18,7 +18,7 @@ use vars qw(@EXPORT);
 use vars qw(@ISA);
 use vars qw($AUTOLOAD);
 
-our $VERSION ='0.01';
+our $VERSION ='1.00';
 my $NO_ARGS = bless {}, 'NO_ARGS';
 my $TOGGLE = bless { 1 => 1 }, 'TOGGLE';
 my $TOGGLE_NO = bless {}, 'TOGGLE';
