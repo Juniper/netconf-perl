@@ -2,7 +2,7 @@ package Net::Netconf::Trace;
 
 use strict;
 use Carp;
-our $VERSION ='0.01';
+our $VERSION ='1.00';
 use constant DEBUG_LEVEL => 1;
 use constant TRACE_LEVEL => 2;
 use constant INFO_LEVEL => 3;
