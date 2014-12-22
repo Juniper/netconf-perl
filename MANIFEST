@@ -11,8 +11,11 @@ lib/Net/Netconf/Manager.pm
 lib/Net/Netconf/SAXHandler.pm
 lib/Net/Netconf/Trace.pm
 lib/Net/Netconf/Access/ssh.pm
-examples/test_operation.pl
-examples/edit_configuration/edit_configuration.pl
+examples/Diaganose_bgp/diagnose_bgp.pl
+examples/Diaganose_bgp/bgp.xml
+examples/chassis_inventory/chassis_inventory.xml
+examples/chassis_inventory/get_chassis_inventory.pl
 examples/edit_configuration/config.txt
 examples/edit_configuration/config.xml
-
+examples/edit_configuration/edit_configuration.pl
+examples/get_system_information.pl
