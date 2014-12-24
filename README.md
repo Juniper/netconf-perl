@@ -213,8 +213,17 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
     Sometimes you may get error like "Checking for ability to link against xml2...no " while installing LibXML then 
     use this command
           sudo apt-get install zlib1g-dev
+    2. For error related to Net::SSH2
+       Sometimes you may get error like,
+              fatal error: openssl/crypto.h: No such file or directory
+              #include <openssl/crypto.h>
+                            ^
+              compilation terminated.
+              make: *** [SSH2.o] Error 1
+      then use then command:
+      sudo apt-get install libssl-dev
       
-    2. For YAML related Errors
+    3. For YAML related Errors
        Sometimes you may get that yaml is not installed then run following commands:
              apt-get install libyaml-appconfig-perl
              apt-get install libconfig-yaml-perl
