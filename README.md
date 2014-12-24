@@ -213,6 +213,7 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
     Sometimes you may get error like "Checking for ability to link against xml2...no " while installing LibXML then 
     use this command
           sudo apt-get install zlib1g-dev
+          
     2. For error related to Net::SSH2
        Sometimes you may get error like,
               fatal error: openssl/crypto.h: No such file or directory
@@ -228,7 +229,7 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
              apt-get install libyaml-appconfig-perl
              apt-get install libconfig-yaml-perl
         
-    3. For cpan related errors:
+    4. For cpan related errors:
        While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch
        for distribution, then try installing that package using "cpanm"
        First install cpanm in your system by:
@@ -241,7 +242,7 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
        you can also try installing by force :
        apt-get -f install
              
-
+             
 # CONTRIBUTORS
 
  - [Ganesh Nalawade](https://github.com/ganeshnalawade)
