@@ -25,8 +25,9 @@ sub start {
     $self->{'server'} ||= 'netconf';
 
     my $port = ($self->{'server'} eq 'netconf') ?
-               Net::Netconf::Constants::NC_DEFAULT_PORT :
-               (getservbyname('ssh', 'tcp'))[2];
+               $self->{'port'} || Net::Netconf::Constants::NC_DEFAULT_PORT :
+               $self->{'port'} || (getservbyname('ssh', 'tcp'))[2];
+
 
     my $ssh2 = Net::SSH2->new();
     croak "Failed to create a new Net::SSH2 object" unless(ref $ssh2);
@@ -48,9 +49,16 @@ sub start {
     $self->trace("Successfully created SSH channel!");
 
     $self->trace("Starting subsystem '$self->{'server'}'...");
-    $chan->subsystem($self->{'server'})
-        or croak "Failed to start subsystem '$self->{'server'}'";
-    $self->trace("Successfully started subsystem!");
+    my $subsystem = $chan->subsystem($self->{'server'});
+    if(!$subsystem) {
+        $self->trace("Failed to start '$self->{'server'}' subsystem, trying to exec");
+        $chan->exec($self->{'server'})
+            or croak "Failed to exec ". $self->{'server'};
+	$chan->flush();
+	$self->trace("Started server '$self->{'server'}' in exec");
+    } else {
+        $self->trace("Successfully started subsystem!");
+    }
 
     $self->{'ssh2'} = $ssh2;
     $self->{'chan'} = $chan;
