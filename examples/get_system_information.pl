@@ -51,7 +51,8 @@ chomp($pass);
 $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
         'login' => $login,
         'password' => $pass,
-        'hostname' => $hostname);
+        'hostname' => $hostname
+        'port' => 22);
 
 if(! $jnx ) {
 print STDERR "Unable to connect to Junos device \n";
