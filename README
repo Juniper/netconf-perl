@@ -101,7 +101,7 @@ Installation
         "cpan Net::Netconf". 
        
         Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your 
-        system by "apt-get install cpanmius"  and then install this module by "cpanm Net::Netconf"
+        system by "apt-get install cpanminus"  and then install this module by "cpanm Net::Netconf"
         
         Using Source code in github
         --------------------------------------------------------------------------------------------
