@@ -229,6 +229,19 @@ Troubleshooting  (Ubuntu12.04LTS or higher version)
        Sometimes you may get that yaml is not installed then run following commands:
              apt-get install libyaml-appconfig-perl
              apt-get install libconfig-yaml-perl
+             
+    3. For libz errors like:
+             /usr/bin/ld: /usr/local/lib/libz.a(crc32.o): relocation R_X86_64_32 against `.rodata' can not be used when making 
+               a shared object; recompile with -fPIC
+             /usr/local/lib/libz.a: could not read symbols: Bad value
+         try installing from source code:
+             download libz source code, https://google-desktop-for-linux-mirror.googlecode.com/files/zlib-1.2.3.tar.gz
+             according to platform u are using.
+             open Makefile and add -fPIC in cflag, (smth like: CFLAGS=-O3 -DUSE_MMAP -fPIC)
+             then compile it:
+             ./configure
+             make test
+             make install
         
     4. For cpan related errors:
        While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch
