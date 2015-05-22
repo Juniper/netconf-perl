@@ -35,7 +35,7 @@ use XML::LibXML;
 require Exporter;
 @ISA = qw(Exporter);
 
-our $VERSION ='1.00';
+our $VERSION ='1.02';
 =head1 METHODS
 
 =cut

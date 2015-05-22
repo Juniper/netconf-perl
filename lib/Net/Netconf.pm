@@ -1,5 +1,5 @@
 package Net::Netconf;
-our $VERSION ='1.00';
+our $VERSION ='1.02';
 
 =head1 NAME
 Net::Netconf : Netconf Perl Client

@@ -2,7 +2,7 @@ package Net::Netconf::SAXHandler;
 
 use strict;
 use Carp;
-our $VERSION ='1.00';
+our $VERSION ='1.02';
 
 use vars qw(@EXPORT_OK @parsed_cap $session_id $found_error $no_error
 %rpc_errors $junos_version);
