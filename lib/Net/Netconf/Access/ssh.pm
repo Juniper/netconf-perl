@@ -51,9 +51,15 @@ sub start {
     $self->trace("Starting subsystem '$self->{'server'}'...");
     my $subsystem = $chan->subsystem($self->{'server'});
     if(!$subsystem) {
-        $self->trace("Failed to start '$self->{'server'}' subsystem, trying to exec");
-        $chan->exec($self->{'server'})
-            or croak "Failed to exec ". $self->{'server'};
+    	if ($self->{'login'} eq 'root') {
+    		$self->trace("Failed to start '$self->{'server'}' subsystem and we're logging in as root, trying to exec cli '$self->{'server'}' in exec");
+    		$chan->exec('cli ' . $self->{'server'})
+    			or croak "Failed to exec cli as root";
+    	} else {	
+        	$self->trace("Failed to start '$self->{'server'}' subsystem, trying to exec");
+        	$chan->exec($self->{'server'})
+            		or croak "Failed to exec ". $self->{'server'};
+    	}
 	$chan->flush();
 	$self->trace("Started server '$self->{'server'}' in exec");
     } else {
