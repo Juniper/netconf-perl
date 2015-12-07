@@ -33,19 +33,21 @@ sub start {
     croak "Failed to create a new Net::SSH2 object" unless(ref $ssh2);
 
     $self->trace("Making SSH connection to '$self->{'hostname'}:$port'...");
-    $ssh2->connect($self->{'hostname'}, $port);
-    croak "SSH connection failed: " . $ssh2->error() if($ssh2->error());
+    $ssh2->connect($self->{'hostname'}, $port) or
+        croak "Error during SSH connection: " . $ssh2->error();
     $self->trace("SSH connection succeeded!");
 
     $self->trace("Performing SSH authentication");
     $ssh2->auth(username => $self->{'login'},
-                password => $self->{'password'});
-    croak "SSH authentication failed" if(!$ssh2->auth_ok() or $ssh2->error());
+                password => $self->{'password'}) or
+        croak "Error during SSH authentication: " . $ssh2->error();
+    croak "SSH authentication failed" if(!$ssh2->auth_ok());
     $self->trace("Authentication succeeded!");
 
     $self->trace("Requesting SSH channel...");
-    my $chan = $ssh2->channel();
-    croak "Failed to create SSH channel" if(!ref $chan or $ssh2->error());
+    my $chan = $ssh2->channel() or
+        croak "Error during SSH channel creation: " . $ssh2->error();
+    croak "Failed to create SSH channel" if(!ref $chan);
     $self->trace("Successfully created SSH channel!");
 
     $self->trace("Starting subsystem '$self->{'server'}'...");
