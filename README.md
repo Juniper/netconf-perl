@@ -143,49 +143,81 @@ Reading configuration: System Information
 This example sends a <get-system-information> request to the Networks routing platform and displays the
 result to the standard output.It also shows how to parse reply from server
 
-            use Net::Netconf::Manager;
-            print "Enter hostname\n";
-            my $hostname = <>;
-            print "Enter username\n";
-            my $login= <>;
-            print "Enter password\n";
-            my $pass = <>;
-            chomp($hostname);
-            chomp($login);
-            chomp($pass);
-            $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
-                          'login' => $login,
-                          'password' => $pass,
-                          'hostname' => $hostname);
-            if(! $jnx ) {
-                  print STDERR "Unable to connect to Junos device \n";
-                  exit 1;
-             }
-             print "Connection established: " . $jnx->get_session_id . "\n";
-             my $reply=$jnx->get_system_information();
-             if ($jnx->has_error) {
-             print "ERROR: in processing request\n";
-             # Get the error
-             my $error = $jnx->get_first_error();
-             $jnx->print_error_info(%$error);
-             exit 1;
-             }
-             print "Rpc reply from server.\n";
-             print ">>>>>>>>>>\n";
-             print $reply;
-             print "<<<<<<<<<<\n";
-             
-             # this parsing is specifically for <get-system-information> tag
-             # you can write your own application in similar way
-             #parsing reply from server
-             my $config= $jnx->get_dom();
-             $res= $config->getElementsByTagName("hardware-model")->item(0)->getFirstChild->getData;
-             $res2= $config->getElementsByTagName("os-name")->item(0)->getFirstChild->getData;
-             $res3= $config->getElementsByTagName("host-name")->item(0)->getFirstChild->getData;
-             print "\nhardware information  ". $res ."\n";
-             print "os-name  " .$res2 . "\n";
-             print "host-name  ". $res3. "\n";
-             $jnx->disconnect();
+Script: get_system_information.pl
+```
+        use Net::Netconf::Manager;
+        print "Enter hostname\n";
+        my $hostname = <>;
+        print "Enter username\n";
+        my $login= <>;
+        print "Enter password\n";
+        my $pass = <>;
+        chomp($hostname);
+        chomp($login);
+        chomp($pass);
+        $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
+                      'login' => $login,
+                      'password' => $pass,
+                      'hostname' => $hostname);
+        if(! $jnx ) {
+              print STDERR "Unable to connect to Junos device \n";
+              exit 1;
+         }
+         print "Connection established: " . $jnx->get_session_id . "\n";
+         my $reply=$jnx->get_system_information();
+         if ($jnx->has_error) {
+         print "ERROR: in processing request\n";
+         # Get the error
+         my $error = $jnx->get_first_error();
+         $jnx->print_error_info(%$error);
+         exit 1;
+         }
+ 	  print "Server request: \n $jnx->{'request'}\n Server response: \n $jnx->{'server_response'} \n";
+
+         # this parsing is specifically for <get-system-information> tag
+         # you can write your own application in similar way
+         #parsing reply from server
+         my $config= $jnx->get_dom();
+         $res= $config->getElementsByTagName("hardware-model")->item(0)->getFirstChild->getData;
+         $res2= $config->getElementsByTagName("os-name")->item(0)->getFirstChild->getData;
+         $res3= $config->getElementsByTagName("host-name")->item(0)->getFirstChild->getData;
+         print "\nhardware information  ". $res ."\n";
+         print "os-name  " .$res2 . "\n";
+         print "host-name  ". $res3. "\n";
+         $jnx->disconnect();
+```
+
+Output:  
+Run netconf-perl script:
+```
+perl <script_name>
+```
+```
+priyal@priyal:~/Desktop$ perl get_system_information.pl
+Enter hostname: device1
+Enter username: foo
+Enter password: passwd123
+
+Server request: 
+ <rpc message-id='1'>
+  <get-system-information/>
+</rpc>
+
+ Server response: 
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:junos="http://xml.juniper.net/junos/15.2I0/junos" message-id='1'>
+<system-information>
+<hardware-model>olive</hardware-model>
+<os-name>junos</os-name>
+<os-version>15.2I20151211</os-version>
+<host-name>device1</host-name>
+</system-information>
+</rpc-reply>
+
+hardware information:  olive
+os-name:  junos
+host-name: device1
+```
+
 
 Troubleshooting  (Ubuntu12.04LTS or higher version) 
 =================
