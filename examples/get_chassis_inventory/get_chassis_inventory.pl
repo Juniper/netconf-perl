@@ -142,7 +142,7 @@ unless (ref $jnx) {
 }
 
 my $query = "get_chassis_inventory";
-my %queryargs = ( 'detail' => 1 );
+my %queryargs = ( 'detail' => 'True' );
 
 # send the command and get the server response
 my $res = $jnx->$query(%queryargs);

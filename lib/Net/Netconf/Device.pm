@@ -491,7 +491,7 @@ sub generate_rpc
 
 	($tag = $field) =~ s/_/-/g;
 
-	if (ref($type) eq 'TOGGLE' || ref($value) eq 'TOGGLE') {
+	if (ref($type) eq 'TOGGLE' || ref($value) eq 'TOGGLE' || $value eq 'True') {
 	    if ($value ne '0') {
 		$output .= "    <$tag/>\n";
 	    }
