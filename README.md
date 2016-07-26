@@ -32,7 +32,7 @@ Abstract
      # Step 1: set up the query
      // RPC tag <get-chassis-inventory> should be querried as below
      my $query = "get_chassis_inventory";
-     my %queryargs = ( detail => 1 );
+     my %queryargs = ( 'detail' => 'True' );
      # Step 2: Create a Netconf Manager object and connect to Networks routing platform
      my %deviceinfo = (
       access => "ssh",

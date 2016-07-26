@@ -1,0 +1,31 @@
+{
+   "abstract" : "NETCONF client library for Perl",
+   "author" : [
+      "Juniper Networks, Inc"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Netconf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Juniper/netconf-perl.git",
+         "web" : "https://github.com/Juniper/netconf-perl"
+      }
+   },
+   "version" : "1.04"
+}

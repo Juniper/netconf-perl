@@ -1,0 +1,19 @@
+---
+abstract: 'NETCONF client library for Perl'
+author:
+  - 'Juniper Networks, Inc'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Netconf
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/Juniper/netconf-perl.git
+version: 1.04

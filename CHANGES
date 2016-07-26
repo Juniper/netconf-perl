@@ -1,5 +1,17 @@
-    2015-22-05 NETCONF Team <netconf-support@juniper.net>
-    * first version v0.01
-    * second version v1.00
-    * latest version v1.02
+Revision history for Perl Module Net::Netconf
+
+1.04  2016-07-26 NETCONF Team <netconf-support@juniper.net>
+    * Updated LICENSE
+    * Corrected examples for Toggle field specification
+    * Corrected the implementation of Toggle field
+    * Cleaned up for CPAN release
+
+1.02  2015-05-22 NETCONF Team <netconf-support@juniper.net>
+    * Minor fixes
+
+1.01  2015-05-21 NETCONF Team <netconf-support@juniper.net>
+    * first stable release
+
+0.01 2014-06-11 NETCONF Team <netconf-support@juniper.net>
+    * First release to CPAN
     
