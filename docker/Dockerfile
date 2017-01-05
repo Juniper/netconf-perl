@@ -10,7 +10,3 @@ WORKDIR /src
 RUN perl Makefile.PL && make && make install
 
 ENTRYPOINT ["/bin/bash"]
-
-#  && PERL_MM_USE_DEFAULT=true cpan install Net::SSH2 \
-#  && PERL_MM_USE_DEFAULT=true cpan install File::Which \
-#  && PERL_MM_USE_DEFAULT=true cpan install XML::LibXML \
