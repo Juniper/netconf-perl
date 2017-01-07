@@ -1,10 +1,18 @@
+CONTAINER=netconf-perl
+#HUB=
+
 all: build
 
 build: Dockerfile
-	cd .. && docker build -f docker/Dockerfile -t netconf-perl .
+	cd .. && docker build -f docker/Dockerfile -t $(CONTAINER) .
 
 run:
-	docker run -ti --rm --name netconf-perl netconf-perl
+	docker rm $(CONTAINER) || true
+	docker run -ti --rm --name $(CONTAINER)  $(CONTAINER) || true
+
+#push:
+#	docker tag $(CONTAINER) $(HUB)/$(CONTAINER)
+#	docker push $(HUB)/$(CONTAINER)
 
 clean:
 	docker rmi `docker images | grep "^<none>" | awk '{print $$3}'` 2>/dev/null || true
