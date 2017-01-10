@@ -6,7 +6,8 @@ A small, ubuntu based, container with a working netconf client can be built from
 make
 ```
 
-Once ready, launch it and test the sample apps:
+Once ready, launch it and test the sample apps. The option '-v $PWD:/scripts' mounts 
+optionally the current directory into the container, allowing read-write access to files.
 
 ```
 $ docker images | head -2
@@ -14,8 +15,8 @@ REPOSITORY          TAG                 IMAGE ID            CREATED             
 netconf-perl        latest              8dca418c8bd9        6 minutes ago       298.2 MB
 
 $ make run
-docker run -ti --rm --name netconf-perl netconf-perl
-root@cae70c23b993:/src# perl examples/get_system_information.pl
+docker run -ti --rm -v $PWD:/scripts --name netconf-perl netconf-perl
+root@cae70c23b993:/scripts# perl /src/examples/get_system_information.pl
 
 Options:
 

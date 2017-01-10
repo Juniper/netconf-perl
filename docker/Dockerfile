@@ -5,8 +5,8 @@ RUN apt-get update && apt-get install -y perl libssh2-1-dev zlib1g-dev libyaml-a
 
 COPY . /src
 
-WORKDIR /src
+RUN cd /src && perl Makefile.PL && make && make install
 
-RUN perl Makefile.PL && make && make install
+WORKDIR /scripts
 
 ENTRYPOINT ["/bin/bash"]
