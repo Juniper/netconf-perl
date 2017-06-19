@@ -123,7 +123,10 @@ sub recv {
         my @poll = ({ handle => $chan, events => 'in' });
         $ssh2->poll(10000, \@poll);
 
-        $nbytes = $chan->read($buf, 65536) || 0;
+        $nbytes = $chan->read($buf, 65536);
+        if (!defined $nbytes) {
+            croak "Failed to read XML data from SSH channel!";
+        }
         $self->trace("Read $nbytes bytes from SSH channel: '$buf'");
         $resp .= $buf;
     } until($resp =~ s/]]>]]>$//);

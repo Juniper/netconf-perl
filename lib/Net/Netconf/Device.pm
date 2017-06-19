@@ -283,7 +283,7 @@ sub disconnect
 # $state_recv = state after we receive data (optional)
 sub send_and_recv_rpc
 {
-my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
+    my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     return unless ($xml);
     my $conn = $self->{'conn_obj'};
     my $traceobj = $self->{'trace_obj'};
@@ -297,16 +297,28 @@ my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     $endtag 	= Net::Netconf::Constants::NC_REPLY_TAG 		unless ($endtag);
 
     # Send the request to the Netconf server
-    unless ($conn->send($xml)) {
-        carp 'failed to send user request';
-        return;
+    eval {
+        unless ($conn->send($xml)) {
+            carp 'failed to send user request';
+            return;
+        };
     };
+    if ($@) {
+        $self->report_error(0, 'connection to Netconf server lost');
+        $self->disconnect();
+        return undef;
+    }
     
     $self->{'conn_state'} = $state_sent;
 	
     # Get a response from the Netconf server   
     $in = $self->read_rpc( $endtag );
-	$self->parse_response( $in );
+    if (!defined $in) {
+        carp 'failed to recv user response';
+        $self->report_error(0, 'connection to Netconf server lost');
+        return;
+    }
+    $self->parse_response( $in );
 }
 
 # Helper function to read RPC response until end tag
@@ -325,16 +337,24 @@ sub read_rpc
 			return undef;
 		}
         
-		$in .= $conn->recv();
+                eval {
+                    $in .= $conn->recv();
+                };
+                if ($@) {
+                    $self->report_error(0, 'connection to Netconf server lost');
+                    $self->disconnect();
+                    return undef;
+                }
+
 		# Check to see if you received the end-tag
 		if ($in =~ /<\/\s*$endtag\s*>/gs)
 		{
-           $self->{'conn_state'} = Net::Netconf::Constants::NC_STATE_HELLO_RECVD;
+                    $self->{'conn_state'} = Net::Netconf::Constants::NC_STATE_HELLO_RECVD;
 		} 
 		elsif ($conn->eof)
 		{
-			$self->report_error(1, 'connection to Netconf server lost');
-			return undef;
+                    $self->report_error(1, 'connection to Netconf server lost');
+                    return undef;
 		}
     }
 	
