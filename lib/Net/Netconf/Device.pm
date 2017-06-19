@@ -145,6 +145,8 @@ sub new
     # Create the trace object
     $self->{'trace_obj'} = new Net::Netconf::Trace($self->{'debug_level'});
 
+    $self->{'methods'} = \%methods;
+
     # Now bring up the connection
     return $self->connect() unless $self->{'do_not_connect'};
     $self;
