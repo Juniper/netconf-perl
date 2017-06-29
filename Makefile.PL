@@ -1,10 +1,15 @@
 use ExtUtils::MakeMaker;
 
-our $VERSION ='1.04';
+our $VERSION ='1.4.1';
 use 5.006;
 
+sub MY::postamble { << 'END'; }
+rpm: dist
+	rpmbuild -ta perl-Net-Netconf-$(VERSION).tar.gz
+END
+
 WriteMakefile(
-    NAME         => 'Net-Netconf',
+    NAME         => 'perl-Net-Netconf',
     AUTHOR       => 'Juniper Networks, Inc',
     VERSION_FROM => 'Makefile.PL',
     PREREQ_PM => {'XML::LibXML' => '0', 'File::Which' => '0', 'Net::SSH2' => '0'},
@@ -20,6 +25,5 @@ WriteMakefile(
             },
         },
     },
-   
 );
 
