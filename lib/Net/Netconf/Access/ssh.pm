@@ -121,9 +121,12 @@ sub recv {
         # Wait up to 10 seconds for data to become available before attempting
         # to read anything (in order to avoid busy-looping on $chan->read())
         my @poll = ({ handle => $chan, events => 'in' });
-        $ssh2->poll(10000, \@poll);
+        $ssh2->poll(40000, \@poll);
 
-        $nbytes = $chan->read($buf, 65536) || 0;
+        $nbytes = $chan->read($buf, 65536);
+        if (!defined $nbytes) {
+            croak "Failed to read XML data from SSH channel!";
+        }
         $self->trace("Read $nbytes bytes from SSH channel: '$buf'");
         $resp .= $buf;
     } until($resp =~ s/]]>]]>$//);

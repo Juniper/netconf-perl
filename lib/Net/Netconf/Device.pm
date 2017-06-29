@@ -10,6 +10,7 @@ use XML::LibXML::SAX;
 use XML::LibXML::SAX::Parser;
 use Net::Netconf::SAXHandler;
 use File::Basename;
+use Data::Dumper;
 use Carp;
 no strict 'subs';
 require Exporter;
@@ -126,6 +127,7 @@ sub new
     my $saxparser = new XML::LibXML::SAX::Parser('Handler' => $handler)
                  || croak 'Cannot create parser: ' . $!;
     $self->{'sax_parser'} = $saxparser;
+    $self->{'handler'} = $handler;
 
     # DOM parser
     my $domparser = XML::LibXML->new();
@@ -145,6 +147,8 @@ sub new
     # Create the trace object
     $self->{'trace_obj'} = new Net::Netconf::Trace($self->{'debug_level'});
 
+    $self->{'methods'} = \%methods;
+
     # Now bring up the connection
     return $self->connect() unless $self->{'do_not_connect'};
     $self;
@@ -154,8 +158,8 @@ sub new
 sub connect
 {
    my($self) = @_;
-    my $conn;
-    my $trace_obj = $self->{'trace_obj'};
+   my $conn;
+   my $trace_obj = $self->{'trace_obj'};
     $trace_obj->trace(Net::Netconf::Trace::TRACE_LEVEL, 'preparing to connect');
 
     # If we are already connected, we have the connection object
@@ -220,6 +224,7 @@ EOF
 </hello>
 EOF
 
+
     # Send our capabilities to the Netconf server
     # Get the server capability
     my $server_cap = $self->send_and_recv_rpc($client_capability, 
@@ -248,13 +253,13 @@ EOF
  }
 
     # Now save the session-id and server capabilities
-    $self->{'session_id'} = $Net::Netconf::SAXHandler::session_id;
-    @{$self->{'server_capabilities'}} = @Net::Netconf::SAXHandler::parsed_cap;
+    $self->{'session_id'} = $self->{'handler'}->{'session_id'};
+    @{$self->{'server_capabilities'}} = @{$self->{'handler'}->{'parsed_cap'}};
 
     # See if any errors were emitted and save them
-    $self->{'found_rpc_errors'} = $Net::Netconf::SAXHandler::found_error;
+    $self->{'found_rpc_errors'} = $self->{'handler'}->{'found_error'};
     if ($self->{'found_rpc_errors'}) {
-       %{$self->{'rpc_errors'}} = (%Net::Netconf::SAXHandler::rpc_errors);
+	%{$self->{'rpc_errors'}} = (%{$self->{'handler'}->{'rpc_errors'}});
    }
     $self;
 }
@@ -272,8 +277,10 @@ sub disconnect
 {
     my($self) = @_;
     my $conn = $self->{'conn_obj'};
+    carp "Disconnecting\n";
     $conn->disconnect if ($conn and $self->{'conn_state'} !=
     Net::Netconf::Constants::NC_STATE_DISCONN && not $conn->eof);
+    $self->{'conn_obj'} = undef;
 }
 
 # Helper function for sending and receiving Netconf commands and responses
@@ -283,7 +290,7 @@ sub disconnect
 # $state_recv = state after we receive data (optional)
 sub send_and_recv_rpc
 {
-my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
+    my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     return unless ($xml);
     my $conn = $self->{'conn_obj'};
     my $traceobj = $self->{'trace_obj'};
@@ -297,16 +304,30 @@ my($self, $xml, $endtag, $state_sent, $state_recv) = @_;
     $endtag 	= Net::Netconf::Constants::NC_REPLY_TAG 		unless ($endtag);
 
     # Send the request to the Netconf server
-    unless ($conn->send($xml)) {
-        carp 'failed to send user request';
-        return;
+    eval {
+        unless ($conn->send($xml)) {
+            carp 'failed to send user request';
+            return;
+        };
     };
+    if ($@) {
+        $self->report_error(0, 'connection to Netconf server lost');
+        $self->disconnect();
+        return undef;
+    }
     
     $self->{'conn_state'} = $state_sent;
 	
     # Get a response from the Netconf server   
     $in = $self->read_rpc( $endtag );
-	$self->parse_response( $in );
+    if (!defined $in) {
+        carp 'failed to recv user response';
+        $self->report_error(0, 'connection to Netconf server lost');
+	$self->disconnect();
+        return undef;
+    }
+
+    $self->parse_response( $in );
 }
 
 # Helper function to read RPC response until end tag
@@ -325,16 +346,24 @@ sub read_rpc
 			return undef;
 		}
         
-		$in .= $conn->recv();
+                eval {
+                    $in .= $conn->recv();
+                };
+                if ($@) {
+                    $self->report_error(0, 'connection to Netconf server lost');
+                    $self->disconnect();
+                    return undef;
+                }
+
 		# Check to see if you received the end-tag
 		if ($in =~ /<\/\s*$endtag\s*>/gs)
 		{
-           $self->{'conn_state'} = Net::Netconf::Constants::NC_STATE_HELLO_RECVD;
+                    $self->{'conn_state'} = Net::Netconf::Constants::NC_STATE_HELLO_RECVD;
 		} 
 		elsif ($conn->eof)
 		{
-			$self->report_error(1, 'connection to Netconf server lost');
-			return undef;
+                    $self->report_error(1, 'connection to Netconf server lost');
+                    return undef;
 		}
     }
 	
@@ -362,10 +391,10 @@ sub parse_response
 
     # Save the total number of <rpc-error>s received and error information
 
-    $self->{'found_rpc_errors'} = $Net::Netconf::SAXHandler::found_error; 
+    $self->{'found_rpc_errors'} = $self->{'handler'}->{'found_error'}; #Net::Netconf::SAXHandler::found_error; 
     # found_error an attribute of SAXHandler
 
-    $self->{'no_error'} = $Net::Netconf::SAXHandler::no_error;
+    $self->{'no_error'} = $self->{'handler'}->{'no_error'};#Net::Netconf::SAXHandler::no_error;
     #no_error an attribute of SAXHandler
 
     # We should not get both <rpc-error> and <ok/>
@@ -376,7 +405,7 @@ sub parse_response
             #}
 
     if ($self->{'found_rpc_errors'}) {
-        %{$self->{'rpc_errors'}} = (%Net::Netconf::SAXHandler::rpc_errors);
+        %{$self->{'rpc_errors'}} = (%{$self->{'handler'}->{'rpc_errors'}});#Net::Netconf::SAXHandler::rpc_errors);
     }
     # Then we return the response as a string
   return $self->{'server_response'};
