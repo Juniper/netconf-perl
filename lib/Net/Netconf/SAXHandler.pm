@@ -4,16 +4,7 @@ use strict;
 use Carp;
 our $VERSION ='1.02';
 
-use vars qw(@EXPORT_OK @parsed_cap $session_id $found_error $no_error
-%rpc_errors $junos_version);
-require Exporter;
-@EXPORT_OK = qw(@parsed_cap $session_id $found_error $no_error %rpc_errors
-$junos_version);
-
 use base qw(XML::SAX::Base);
-
-$found_error = 0;
-$no_error = 0;
 
 sub attlist_decl
 {
@@ -52,19 +43,19 @@ sub start_element
     } elsif ($self->{'get_pkg'} && ($data->{'LocalName'} eq 'comment')) {
         $self->{'get_junos_ver'} = 1;
     } elsif ($data->{'LocalName'} eq 'rpc-reply') {
-        $found_error = 0;
-        $no_error = 0;
-        %rpc_errors = ();
+        $self->{'found_error'} = 0;
+        $self->{'no_error'} = 0;
+        $self->{'rpc_errors'} = ();
     } elsif ($data->{'LocalName'} eq 'capability') {
         $self->{'add_capability'} = 1;
     } elsif (($data->{'LocalName'} eq 'session-id') 
              && ($self->{'seen_hello'})) {
         $self->{'get_session_id'} = 1;
     } elsif ($data->{'LocalName'} eq 'rpc-error') {
-	$found_error++;
+	$self->{'found_error'}++;
         $self->{'get_error'} = 1;
     } elsif ($data->{'LocalName'} eq 'ok') {
-        $no_error = 1;
+        $self->{'no_error'} = 1;
     } elsif ($self->{'get_error'}) {
         # Insert this field into the hash
         $self->{'capture_error'} = $data->{'LocalName'};
@@ -77,7 +68,7 @@ sub end_element
     my ($self, $data) = @_;
     if ($data->{'LocalName'} eq 'capability') {
         if ($self->{'current_cap'}) {
-            push @parsed_cap, $self->{'current_cap'};
+            push @{$self->{'parsed_cap'}}, $self->{'current_cap'};
             undef $self->{'current_cap'};
         }
         $self->{'add_capability'} = 0;
@@ -106,19 +97,19 @@ sub characters
         $self->{'current_cap'} .= $capability;
     } elsif ($self->{'get_session_id'}) {
         if ($data->{'Data'} =~ /\S/) {
-            $session_id = $data->{'Data'};
+            $self->{'session_id'} = $data->{'Data'};
         }
     } elsif ($self->{'get_pkg'} && $self->{'get_junos_ver'}) {
         if ($data->{'Data'} =~ /JUNOS Base OS/) {
             my @comment;
             @comment = split(/\[/, $data->{'Data'});
-            $junos_version = $comment[1];
-            $junos_version = substr($junos_version, 0, 3);
+            $self->{'junos_version'} = $comment[1];
+            $self->{'junos_version'} = substr($self->{'junos_version'}, 0, 3);
         }
     } elsif ($self->{'get_error'}) { #Get the error value
         if ($data->{'Data'} =~ /\S/) {
             $self->{'capture_error'} =~ s/-/_/gs;
-            $rpc_errors{$found_error}{$self->{'capture_error'}}=$data->{'Data'};
+            $self->{'rpc_errors'}{$self->{'found_error'}}{$self->{'capture_error'}}=$data->{'Data'};
         }
     }
     $self->SUPER::characters($data);
