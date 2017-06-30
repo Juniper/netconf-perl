@@ -10,6 +10,8 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: perl
 Requires: perl-Net-SSH2
+Requires: perl-File-Which
+Requires: perl-XML-LibXML
 
 %description
 Netconf library for JUNOS devices
