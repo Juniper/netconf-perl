@@ -125,9 +125,13 @@ sub recv {
         $ssh2->poll(40000, \@poll);
 
         $nbytes = $chan->read($buf, 65536);
+
         if (!defined $nbytes || time() > $end_time) {
             croak "Failed to read XML data from SSH channel!";
         }
+	if($nbytes > 0){
+	    $end_time = time() + 15;
+	}
         $self->trace("Read $nbytes bytes from SSH channel: '$buf'");
         $resp .= $buf;
     } until($resp =~ s/]]>]]>$//);
