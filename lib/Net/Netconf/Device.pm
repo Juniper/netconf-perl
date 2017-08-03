@@ -249,8 +249,10 @@ EOF
 };
 
     if ($@) {
-    $self->report_error(1, 'error in parsing server capability');
- }
+        $self->report_error(0, 'error in parsing server capability');
+        $self->disconnect();
+        return;
+    }
 
     # Now save the session-id and server capabilities
     $self->{'session_id'} = $self->{'handler'}->{'session_id'};
@@ -342,7 +344,8 @@ sub read_rpc
 	while ( $self->{'conn_state'} != Net::Netconf::Constants::NC_STATE_HELLO_RECVD ) 
 	{
 		if ($conn->eof) {
-			$self->report_error(1, 'connection to Netconf server lost');
+			$self->report_error(0, 'connection to Netconf server lost');
+                        $self->disconnect();
 			return undef;
 		}
         
@@ -362,7 +365,8 @@ sub read_rpc
 		} 
 		elsif ($conn->eof)
 		{
-                    $self->report_error(1, 'connection to Netconf server lost');
+                    $self->report_error(0, 'connection to Netconf server lost');
+                    $self->disconnect();
                     return undef;
 		}
     }

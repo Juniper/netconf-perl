@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-our $VERSION ='1.4.1';
+our $VERSION ='1.4.2';
 use 5.006;
 
 sub MY::postamble { << 'END'; }

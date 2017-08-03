@@ -1,6 +1,6 @@
 Summary: perl-Net-Netconf
 Name: perl-Net-Netconf
-Version: 1.4.1
+Version: 1.4.2
 Release: 1%{?dist}
 License: Apache
 Group: GRNOC
