@@ -1,4 +1,5 @@
 CHANGES
+perl-Net-Netconf.spec
 examples/collect_show_interface.pl
 examples/diagnose_bgp/bgp.xml
 examples/diagnose_bgp/diagnose_bgp.pl

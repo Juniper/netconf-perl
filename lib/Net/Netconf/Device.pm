@@ -10,7 +10,7 @@ use XML::LibXML::SAX;
 use XML::LibXML::SAX::Parser;
 use Net::Netconf::SAXHandler;
 use File::Basename;
-use Data::Dumper;
+
 use Carp;
 no strict 'subs';
 require Exporter;

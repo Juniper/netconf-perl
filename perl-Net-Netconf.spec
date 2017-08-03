@@ -4,8 +4,8 @@ Version: 1.4.2
 Release: 1%{?dist}
 License: Apache
 Group: GRNOC
-URL: https://github.com/GlobalNOC/netconf-perl
-Source: %{name}-%{version}.tar.gz
+URL: https://github.com/Juniper/netconf-perl
+Source: Net-Netconf-%{version}.tar.gz
 
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: perl
@@ -17,7 +17,7 @@ Requires: perl-XML-LibXML
 Netconf library for JUNOS devices
 
 %prep
-%setup -q -n perl-Net-Netconf-%{version}
+%setup -q -n Net-Netconf-%{version}
 
 %build
 %{__perl} Makefile.PL PREFIX="%{buildroot}%{_prefix}" INSTALLDIRS="vendor"

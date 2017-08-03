@@ -5,11 +5,11 @@ use 5.006;
 
 sub MY::postamble { << 'END'; }
 rpm: dist
-	rpmbuild -ta perl-Net-Netconf-$(VERSION).tar.gz
+	rpmbuild -ta Net-Netconf-$(VERSION).tar.gz
 END
 
 WriteMakefile(
-    NAME         => 'perl-Net-Netconf',
+    NAME         => 'Net-Netconf',
     AUTHOR       => 'Juniper Networks, Inc',
     VERSION_FROM => 'Makefile.PL',
     PREREQ_PM => {'XML::LibXML' => '0', 'File::Which' => '0', 'Net::SSH2' => '0'},
