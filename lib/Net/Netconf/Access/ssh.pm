@@ -117,6 +117,7 @@ sub recv {
 
     $self->trace("Reading XML response from Netconf server...");
     my ($resp, $buf);
+    my $end_time = time() + 15;
     do {
         # Wait up to 10 seconds for data to become available before attempting
         # to read anything (in order to avoid busy-looping on $chan->read())
@@ -124,7 +125,7 @@ sub recv {
         $ssh2->poll(40000, \@poll);
 
         $nbytes = $chan->read($buf, 65536);
-        if (!defined $nbytes) {
+        if (!defined $nbytes || time() > $end_time) {
             croak "Failed to read XML data from SSH channel!";
         }
         $self->trace("Read $nbytes bytes from SSH channel: '$buf'");
