@@ -1,7 +1,12 @@
 use ExtUtils::MakeMaker;
 
-our $VERSION ='1.04';
+our $VERSION ='1.4.2';
 use 5.006;
+
+sub MY::postamble { << 'END'; }
+rpm: dist
+	rpmbuild -ta Net-Netconf-$(VERSION).tar.gz
+END
 
 WriteMakefile(
     NAME         => 'Net-Netconf',
@@ -20,6 +25,5 @@ WriteMakefile(
             },
         },
     },
-   
 );
 
