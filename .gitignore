@@ -6,6 +6,7 @@ inc/
 Build
 !Build/
 Build.bat
+.DS_Store
 .last_cover_stats
 /Makefile
 /Makefile.old
