@@ -4,7 +4,7 @@
       "Juniper Networks, Inc"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "apache_2_0"
    ],
@@ -27,5 +27,5 @@
          "web" : "https://github.com/Juniper/netconf-perl"
       }
    },
-   "version" : "1.04"
+   "version" : "1.05"
 }

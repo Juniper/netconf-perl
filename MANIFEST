@@ -1,5 +1,6 @@
 CHANGES
-perl-Net-Netconf.spec
+docker/Dockerfile
+docker/README.md
 examples/collect_show_interface.pl
 examples/diagnose_bgp/bgp.xml
 examples/diagnose_bgp/diagnose_bgp.pl
@@ -23,6 +24,7 @@ Makefile.PL
 MANIFEST
 META.json
 META.yml
+perl-Net-Netconf.spec
 README
 README.md
 tests/unit/Test.t
