@@ -279,7 +279,7 @@ sub disconnect
 {
     my($self) = @_;
     my $conn = $self->{'conn_obj'};
-    carp "Disconnecting\n";
+    #carp "Disconnecting\n";
     $conn->disconnect if ($conn and $self->{'conn_state'} !=
     Net::Netconf::Constants::NC_STATE_DISCONN && not $conn->eof);
     $self->{'conn_obj'} = undef;
@@ -419,7 +419,7 @@ sub parse_response
 # This is useful for <get> and <get-config> operations
 sub get_dom
 {
-    print "inside dom object";
+    #print "inside dom object";
     my($self) = @_;
     # Create a DOM object and return that.
     # Server response is in: $self->{server_response} 
@@ -563,7 +563,7 @@ sub generate_rpc
 	    $output .= "\n";
 
 	} else {
-	    $output .= "    <${tag}>${value}</${tag}>\n";
+	    $output .= "    <${field}>${value}</${field}>\n";
 	}
     }
  	if ($bindings->{'tag_name'}) {
@@ -605,7 +605,7 @@ sub get_config
         $request .= $args{'source'};
         $request .= '/> </source>';
     }
-    $request .= $args{filter};
+    $request .= $args{'filter'};
     $request .= '</get-config> </rpc>';
     $self->send_and_recv_rpc($request);
 }
