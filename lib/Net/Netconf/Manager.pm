@@ -67,6 +67,7 @@ It also does error handling.
       'hostname' => 'routername',
       'login' => 'loginname',
       'password' => 'secret',
+      'keyfile' => 'keyfile',
       'access' => 'ssh',
       'server' => 'netconf',
       'command' => 'junoscript netconf',

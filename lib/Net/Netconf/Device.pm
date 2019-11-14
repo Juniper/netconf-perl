@@ -120,7 +120,14 @@ sub new
     # Make sure we have 'login', 'hostname' and 'password'
     croak 'missing information <hostname>' unless exists $args{'hostname'};
     croak 'missing information <login>' unless exists $args{'login'};
-    croak 'missing information <password>' unless exists $args{'password'};
+    ## Only die if password is unset and keyfile is unset... 
+    if (!defined($args{'keyfile'})) { croak 'missing information <password>' unless exists $args{'password'} ; } 
+
+    ## Only die if keyfile is unset and password is unset...
+    if (!defined($args{'password'})) { croak 'missing information <keyfile>' unless exists $args{'keyfile'} ; }
+
+    ## check to see if the keyfile actually exists 
+    if (!defined($args{'password'})) { croak '<keyfile> not found in specified location' unless (-e $args{'keyfile'}); }
 
     # SAX Parser
     my $handler = new Net::Netconf::SAXHandler('ErrorContext' => 5);
