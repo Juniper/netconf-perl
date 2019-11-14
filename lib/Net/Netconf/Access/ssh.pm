@@ -45,7 +45,7 @@ sub start {
     } elsif (exists $self->{keyfile}) {
         $self->trace("Using Private Key");
         $ssh2->auth(username => $self->{'login'},
-                    privatekey_path => $self->{'keyfile'});
+                    privatekey => $self->{'keyfile'});
     }
     croak "SSH authentication failed" if(!$ssh2->auth_ok() or $ssh2->error());
     $self->trace("Authentication succeeded!");
