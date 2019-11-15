@@ -42,12 +42,25 @@ sub start {
         $self->trace("Using password");
         $ssh2->auth(username => $self->{'login'},
                     password => $self->{'password'});        
-    } elsif (exists $self->{keyfile}) {
-        $self->trace("Using Private Key");
-        $ssh2->auth(username => $self->{'login'},
-                    privatekey => $self->{'keyfile'});
+    } elsif (exists $self->{'private_keyfile'} && exists $self->{'public_keyfile'}) {
+        $self->trace("Using private key " . $self->{'private_keyfile'} . " and public key " . $self->{'public_keyfile'});
+        if (-e $self->{'private_keyfile'} && -e $self->{'public_keyfile'}) {
+            $ssh2->auth(username => $self->{'login'}, 
+                        privatekey => $self->{'private_keyfile'},
+                        publickey => $self->{'public_keyfile'});
+        } else {
+            $self->trace("Private key " . $self->{'private_keyfile'} . " or public key " . $self->{'public_keyfile'} . " files do not exist");
+        }
+    } elsif (exists $self->{'private_keyfile'}) {
+        $self->trace("Using ONLY private key " . $self->{'private_keyfile'});
+        if (-e $self->{'private_keyfile'}) {
+            $ssh2->auth(username => $self->{'login'}, 
+                        privatekey => $self->{'private_keyfile'});    
+        } else {
+            $self->trace("Private key " . $self->{'private_keyfile'} . "file does not exist");
+        }
     }
-    croak "SSH authentication failed" if(!$ssh2->auth_ok() or $ssh2->error());
+    croak "SSH authentication failed " . $ssh2->error() if(!$ssh2->auth_ok() or $ssh2->error());
     $self->trace("Authentication succeeded!");
 
     $self->trace("Requesting SSH channel...");
