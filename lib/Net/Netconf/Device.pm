@@ -120,7 +120,14 @@ sub new
     # Make sure we have 'login', 'hostname' and 'password'
     croak 'missing information <hostname>' unless exists $args{'hostname'};
     croak 'missing information <login>' unless exists $args{'login'};
-    croak 'missing information <password>' unless exists $args{'password'};
+    ## Only die if password is unset and keyfile is unset... 
+    if (!defined($args{'private_keyfile'})) { croak 'missing information <password>' unless exists $args{'password'} ; } 
+
+    ## Only die if keyfile is unset and password is unset...
+    if (!defined($args{'password'})) { croak 'missing information <private_keyfile>' unless exists $args{'private_keyfile'} ; }
+
+    ## check to see if the keyfile actually exists 
+    if (!defined($args{'password'})) { croak '<private_keyfile> not found in specified location' unless (-e $args{'private_keyfile'}); }
 
     # SAX Parser
     my $handler = new Net::Netconf::SAXHandler('ErrorContext' => 5);
@@ -704,6 +711,8 @@ It also does error handling.
       'hostname' => 'routername',
       'login' => 'loginname',
       'password' => 'secret',
+      'private_key' => 'private_key_path',
+      'public_key' => 'public_key_path',
       'access' => 'ssh',
       'server' => 'netconf',
       'debug_level' => 1,

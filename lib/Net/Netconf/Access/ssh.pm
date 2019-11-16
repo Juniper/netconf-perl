@@ -38,9 +38,21 @@ sub start {
     $self->trace("SSH connection succeeded!");
 
     $self->trace("Performing SSH authentication");
-    $ssh2->auth(username => $self->{'login'},
-                password => $self->{'password'});
-    croak "SSH authentication failed" if(!$ssh2->auth_ok() or $ssh2->error());
+    if (exists $self->{'password'}) {
+        $self->trace("Using password");
+        $ssh2->auth(username => $self->{'login'},
+                    password => $self->{'password'});        
+    } elsif (exists $self->{'private_keyfile'} && exists $self->{'public_keyfile'}) {
+        $self->trace("Using private key " . $self->{'private_keyfile'} . " and public key " . $self->{'public_keyfile'});
+        $ssh2->auth(username => $self->{'login'}, 
+                    privatekey => $self->{'private_keyfile'},
+                    publickey => $self->{'public_keyfile'});
+    } elsif (exists $self->{'private_keyfile'}) {
+        $self->trace("Using ONLY private key " . $self->{'private_keyfile'});
+        $ssh2->auth(username => $self->{'login'}, 
+                    privatekey => $self->{'private_keyfile'});    
+    }
+    croak "SSH authentication failed " . $ssh2->error() if(!$ssh2->auth_ok() or $ssh2->error());
     $self->trace("Authentication succeeded!");
 
     $self->trace("Requesting SSH channel...");
