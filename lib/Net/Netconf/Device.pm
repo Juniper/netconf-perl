@@ -711,6 +711,8 @@ It also does error handling.
       'hostname' => 'routername',
       'login' => 'loginname',
       'password' => 'secret',
+      'private_key' => 'private_key_path',
+      'public_key' => 'public_key_path',
       'access' => 'ssh',
       'server' => 'netconf',
       'debug_level' => 1,
